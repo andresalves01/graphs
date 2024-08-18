@@ -1,9 +1,9 @@
 import java.util.ArrayList;
 
-public class Node {
-  public int name;
+public final class Node {
+  public final int name;
 
-  public Node(int name) {
+  public Node(final int name) {
     this.name = name;
   }
 
@@ -14,7 +14,7 @@ public class Node {
    * @return array of nodes.
    * @throws NegativeArraySizeException
    */
-  public static ArrayList<Node> createNodes(int numberOfNodes) throws NegativeArraySizeException {
+  public static ArrayList<Node> createNodes(final int numberOfNodes) throws NegativeArraySizeException {
     if (numberOfNodes < 0) {
       throw new NegativeArraySizeException("Number of nodes should be a natural number.");
     }
@@ -28,7 +28,7 @@ public class Node {
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     return this.name + "";
   }
 }

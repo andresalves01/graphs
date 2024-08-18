@@ -1,35 +1,54 @@
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-public class Graph {
-  private ArrayList<Node> nodes;
-  public ArrayList<Edge> edges;
+public final class Graph {
+  private final ArrayList<Node> nodes;
+  private final ArrayList<Edge> edges;
 
-  public static Graph fromScanner(Scanner reader) throws IOException {
-    Graph graph = new Graph();
+  public Graph(final ArrayList<Node> nodes, final int numberOfEdges) {
+    this.nodes = nodes;
+    this.edges = new ArrayList<>(numberOfEdges);
+  }
+
+  public static Graph fromScanner(final Scanner reader) throws IOException {
     int numberOfNodes = reader.nextInt();
+    ArrayList<Node> nodes = Node.createNodes(numberOfNodes);
 
-    graph.nodes = new ArrayList<>(numberOfNodes + 1);
-    graph.nodes.add(null); // Empty header for 1-based indexing.
-    graph.nodes.addAll(Node.createNodes(numberOfNodes));
+    int numberOfEdges = reader.nextInt();
+    Graph graph = new Graph(nodes, numberOfEdges);
 
-    graph.edges = Edge.fromScanner(graph, reader);
+    for (int i = 0; i < numberOfEdges; ++i) {
+      int origin = reader.nextInt();
+      int destination = reader.nextInt();
+      graph.insertEdge(origin, destination);
+    }
+
     return graph;
   }
 
-  public List<Node> getNodes() {
-    return this.nodes.stream().filter((node) -> node != null).collect(Collectors.toList());
+  public final ArrayList<Node> getNodes() {
+    return this.nodes;
   }
 
-  public Node getNode(int name) {
-    return this.nodes.get(name);
+  public final Node getNode(final int name) {
+    return this.nodes.get(name - 1);
+  }
+
+  public final ArrayList<Edge> getEdges() {
+    return this.edges;
+  }
+
+  public final void insertEdge(final int originName, final int destinationName) {
+    Node origin = this.getNode(originName);
+    Node destination = this.getNode(destinationName);
+
+    this.edges.add(new Edge(origin, destination));
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     String nodes = this.getNodes().stream().map(Node::toString).collect(Collectors.joining(", "));
     String edges = this.edges.stream().map(Edge::toString).collect(Collectors.joining(", "));
 
