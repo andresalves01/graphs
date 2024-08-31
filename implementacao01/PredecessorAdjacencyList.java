@@ -3,11 +3,11 @@ import java.util.stream.Collectors;
 
 public class PredecessorAdjacencyList {
   private final ArrayList<Node> nodes;
-  private final ArrayList<ArrayList<Node>> list;
+  private final ArrayList<ArrayList<Node>> predecessors;
 
   private PredecessorAdjacencyList(final ArrayList<Node> nodes, final ArrayList<ArrayList<Node>> list) {
     this.nodes = nodes;
-    this.list = list;
+    this.predecessors = list;
   }
 
   public static PredecessorAdjacencyList fromGraph(final Graph graph) {
@@ -29,8 +29,8 @@ public class PredecessorAdjacencyList {
     return this.nodes;
   }
 
-  public final ArrayList<ArrayList<Node>> getList() {
-    return this.list;
+  public final ArrayList<ArrayList<Node>> getPredecessors() {
+    return this.predecessors;
   }
 
   public final int getEntryDegree(final int name) {
@@ -38,6 +38,6 @@ public class PredecessorAdjacencyList {
   }
 
   public final ArrayList<Node> getPredecessorNodes(final int name) {
-    return this.list.get(name - 1);
+    return this.predecessors.get(name - 1);
   }
 }

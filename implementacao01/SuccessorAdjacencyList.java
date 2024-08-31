@@ -3,11 +3,11 @@ import java.util.stream.Collectors;
 
 public class SuccessorAdjacencyList {
   private final ArrayList<Node> nodes;
-  private final ArrayList<ArrayList<Node>> list;
+  private final ArrayList<ArrayList<Node>> sucessors;
 
   private SuccessorAdjacencyList(final ArrayList<Node> nodes, final ArrayList<ArrayList<Node>> list) {
     this.nodes = nodes;
-    this.list = list;
+    this.sucessors = list;
   }
 
   public static SuccessorAdjacencyList fromGraph(final Graph graph) {
@@ -29,8 +29,8 @@ public class SuccessorAdjacencyList {
     return this.nodes;
   }
 
-  public final ArrayList<ArrayList<Node>> getList() {
-    return this.list;
+  public final ArrayList<ArrayList<Node>> getSucessors() {
+    return this.sucessors;
   }
 
   public final int getExitDegree(final int name) {
@@ -38,6 +38,6 @@ public class SuccessorAdjacencyList {
   }
 
   public final ArrayList<Node> getSuccessorNodes(final int name) {
-    return this.list.get(name - 1);
+    return this.sucessors.get(name - 1);
   }
 }
