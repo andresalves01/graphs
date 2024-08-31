@@ -64,6 +64,7 @@ public final class ReverseStar {
   }
 
   public final void printPredecessorNodes(final int name) {
+    System.out.print("Predecessores: ");
     for (Node node : getPredecessorNodes(name)) {
       System.out.print(node.name + " ");
     }

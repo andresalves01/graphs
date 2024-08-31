@@ -64,6 +64,7 @@ public final class ForwardStar {
   }
 
   public final void printSucessorNodes(final int name) {
+    System.out.print("Sucessores: ");
     for (Node node : getSuccessorNodes(name)) {
       System.out.print(node.name + " ");
     }
