@@ -3,56 +3,30 @@ import java.io.*;
 import java.util.stream.Collectors;
 import java.util.function.BiFunction;
 
-public abstract class Graph {
-  private final Set<Integer> nodes;
+public interface Graph {
 
-  public Graph(int nodeSize) {
-    this.nodes = new HashSet<Integer>(nodeSize);
-    for (int i = 0; i < nodeSize; i++) {
-      this.insertNode(i);
-    }
-  }
+  public boolean insertNode(int node);
 
-  public Graph(Set<Integer> nodes) {
-    this.nodes = nodes;
-  }
+  public Set<Integer> getNodes();
 
-  public boolean insertNode(int node) {
-    return nodes.add(node);
-  }
+  public boolean contains(int node);
 
-  public final Set<Integer> getNodes() {
-    return nodes;
-  }
+  public boolean removeNode(int node);
 
-  public final boolean contains(int node) {
-    return nodes.contains(node);
-  }
+  public boolean insertEdge(int origin, int destination);
 
-  public final boolean removeNode(int node) {
-    removeEdges(node);
-    return nodes.remove(node);
-  }
+  public Set<Edge> getEdges();
 
-  public abstract boolean insertEdge(int origin, int destination);
+  public List<Integer> getAdjacentNodes(int destination) throws NoSuchElementException;
 
-  public abstract List<Edge> getEdges();
+  public boolean removeEdge(int origin, int destination);
 
-  public abstract List<Integer> getAdjacentNodes(int destination) throws NoSuchElementException;
+  public boolean removeEdges(int node);
 
-  public abstract boolean removeEdge(int origin, int destination);
-
-  public final void removeEdges(int node) {
-    List<Integer> adjacentNodes = this.getAdjacentNodes(node);
-    for (int origin : adjacentNodes) {
-      removeEdge(origin, node);
-    }
-  }
-
-  public final void saveGraph(String filename) throws FileNotFoundException {
+  public static void saveGraph(String filename, Graph graph) throws FileNotFoundException {
     try (PrintWriter writer = new PrintWriter(filename)) {
-      List<Edge> edges = getEdges();
-      writer.println(nodes.size() + " " + edges.size());
+      Set<Edge> edges = graph.getEdges();
+      writer.println(graph.getNodes().size() + " " + edges.size());
 
       for (Edge edge : edges) {
         writer.println(edge.origin + " " + edge.destination);
@@ -109,11 +83,11 @@ public abstract class Graph {
     return graph;
   }
 
-  @Override
-  public String toString() {
-    return "V = {" + nodes.stream().map((node) -> node.toString()).collect(Collectors.joining(", ")) + "}\n" +
+  public static String toString(Graph graph) {
+    return "V = {" + graph.getNodes().stream().map((node) -> node.toString()).collect(Collectors.joining(", ")) + "}\n"
+        +
         "E = {"
-        + getEdges().stream().map((edge) -> "{" + edge.origin + ", " + edge.destination + "}")
+        + graph.getEdges().stream().map((edge) -> "{" + edge.origin + ", " + edge.destination + "}")
             .collect(Collectors.joining(", "))
         + "}";
   }
