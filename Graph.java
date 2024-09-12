@@ -1,34 +1,127 @@
 import java.util.*;
+import java.io.*;
 import java.util.stream.Collectors;
+import java.util.function.BiFunction;
 
-public final class Graph extends IGraph {
-  private final Set<Edge> edges;
+public abstract class Graph {
+  private final Set<Integer> nodes;
 
-  public Graph(int numberOfNodes, int numberOfEdges) {
-    super(numberOfNodes);
-    this.edges = new HashSet<>(numberOfEdges);
+  public Graph(int nodeSize) {
+    this.nodes = new HashSet<Integer>(nodeSize);
+    for (int i = 0; i < nodeSize; i++) {
+      this.insertNode(i);
+    }
   }
 
-  public Graph(Set<Integer> nodes, Set<Edge> edges) {
-    super(nodes);
-    this.edges = edges;
+  public Graph(Set<Integer> nodes) {
+    this.nodes = nodes;
   }
 
-  public boolean insertEdge(int origin, int destination) {
-    return this.edges.add(new Edge(origin, destination));
+  public boolean insertNode(int node) {
+    return nodes.add(node);
   }
 
-  public List<Edge> getEdges() {
-    return edges.stream().collect(Collectors.toList());
+  public final Set<Integer> getNodes() {
+    return nodes;
   }
 
-  public boolean removeEdge(int edgeOne, int edgeTwo) {
-    return this.edges.remove(new Edge(edgeOne, edgeTwo)) || this.edges.remove(new Edge(edgeTwo, edgeOne));
+  public final boolean contains(int node) {
+    return nodes.contains(node);
   }
 
-  public List<Integer> getAdjacents(int node) {
-    return this.edges.stream().filter((edge) -> edge.origin == node || edge.destination == node)
-        .map((edge) -> edge.origin != node ? edge.origin : edge.destination)
-        .collect(Collectors.toList());
+  public final boolean removeNode(int node) {
+    removeEdges(node);
+    return nodes.remove(node);
+  }
+
+  public abstract boolean insertEdge(int origin, int destination);
+
+  public abstract List<Edge> getEdges();
+
+  public abstract List<Integer> getAdjacentNodes(int destination) throws NoSuchElementException;
+
+  public abstract boolean removeEdge(int origin, int destination);
+
+  public final void removeEdges(int node) {
+    List<Integer> adjacentNodes = this.getAdjacentNodes(node);
+    for (int origin : adjacentNodes) {
+      removeEdge(origin, node);
+    }
+  }
+
+  public final void saveGraph(String filename) throws FileNotFoundException {
+    try (PrintWriter writer = new PrintWriter(filename)) {
+      List<Edge> edges = getEdges();
+      writer.println(nodes.size() + " " + edges.size());
+
+      for (Edge edge : edges) {
+        writer.println(edge.origin + " " + edge.destination);
+      }
+    }
+  }
+
+  public static Graph fromFile(String fileName, BiFunction<Integer, Integer, Graph> constructor)
+      throws FileNotFoundException {
+    try (Scanner scanner = new Scanner(new File(fileName))) {
+      int nodesSize = scanner.nextInt();
+      int edgesSize = scanner.nextInt();
+      Graph graph = constructor.apply(nodesSize, edgesSize);
+
+      for (int i = 0; i < edgesSize; i++) {
+        int origin = scanner.nextInt();
+        int destination = scanner.nextInt();
+
+        graph.insertEdge(origin, destination);
+      }
+
+      return graph;
+    }
+  }
+
+  public static Graph fromRandomEdges(int numberOfNodes, int numberOfEdges,
+      BiFunction<Integer, Integer, Graph> constructor) throws Exception {
+    Graph.validateEdgeNumber(numberOfNodes, numberOfEdges);
+    Graph graph = constructor.apply(numberOfNodes, numberOfEdges);
+
+    int maxNumberOfEdges = (int) Math.ceil(((numberOfNodes * numberOfEdges) - numberOfEdges) * 0.5);
+    if (numberOfEdges == maxNumberOfEdges) {
+      for (int i = 0; i < numberOfNodes; i++) {
+        for (int j = i + 1; j < numberOfNodes; j++) {
+          graph.insertEdge(i, j);
+        }
+      }
+
+      return graph;
+    }
+
+    while (graph.getEdges().size() < numberOfEdges) {
+      int origin = (int) (Math.random() * numberOfNodes);
+      int destination = (int) (Math.random() * numberOfNodes);
+      if (origin == destination) {
+        continue;
+      }
+
+      boolean originLessThanDestination = origin < destination;
+      graph.insertEdge(originLessThanDestination ? origin : destination,
+          originLessThanDestination ? destination : origin);
+    }
+
+    return graph;
+  }
+
+  @Override
+  public String toString() {
+    return "V = {" + nodes.stream().map((node) -> node.toString()).collect(Collectors.joining(", ")) + "}\n" +
+        "E = {"
+        + getEdges().stream().map((edge) -> "{" + edge.origin + ", " + edge.destination + "}")
+            .collect(Collectors.joining(", "))
+        + "}";
+  }
+
+  public static void validateEdgeNumber(int numberOfNodes, int numberOfEdges) throws Exception {
+    int maxNumberOfEdges = (int) Math.ceil(((numberOfNodes * numberOfNodes) - numberOfNodes) * 0.5);
+    if (numberOfEdges > maxNumberOfEdges) {
+      throw new Exception("O número de arestas ultrapassa o número máximo permitido.");
+    }
   }
 }
