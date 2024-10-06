@@ -1,16 +1,21 @@
 public class Main {
-  public static void main(String[] args) throws Exception {
-    AdjacencyList adjacencyList = new AdjacencyList(6, 8);
+    public static void main(String[] args) throws Exception {
+      // Instancia o grafo com lista de adjacência
+    AdjacencyList adjacencyList = new AdjacencyList(6);
 
     adjacencyList.insertEdge(0, 1);
-    adjacencyList.insertEdge(0, 5);
     adjacencyList.insertEdge(1, 2);
-    adjacencyList.insertEdge(1, 4);
-    adjacencyList.insertEdge(1, 5);
-    adjacencyList.insertEdge(2, 3);
-    adjacencyList.insertEdge(2, 5);
+    adjacencyList.insertEdge(2, 0);
+    adjacencyList.insertEdge(1, 3);
     adjacencyList.insertEdge(3, 4);
+    adjacencyList.insertEdge(4, 5);
 
-    System.out.println(CicleSearcher.searchCicle(0, 3, adjacencyList));
+      // Executa a busca de ciclo
+      System.out.println("Resultado da busca de ciclo:");
+      System.out.println(CicleSearcher.searchCicle(0, 3, adjacencyList));
+
+      // Encontra e exibe as articulações no grafo
+      System.out.println("\nArticulações encontradas:");
+      adjacencyList.encontrarArticulacoes();
+    }
   }
-}
