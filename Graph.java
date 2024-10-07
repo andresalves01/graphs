@@ -142,13 +142,6 @@ public abstract class Graph {
       }
     }
 
-    // Exibe as articulações encontradas
-    System.out.println("Articulações no grafo:");
-    for (int i = 0; i < nodes.size(); i++) {
-      if (isArticulation[i]) {
-        System.out.println("Vértice " + i);
-      }
-    }
   }
 
   // Método utilitário recursivo para encontrar articulações usando DFS

@@ -46,9 +46,6 @@ public class Tarjan {
     this.BCC();
     components = new LinkedList<>(components.stream().filter(component -> !component.isEmpty())
         .collect(Collectors.toList()));
-    for (LinkedList<Integer> element : components) {
-      System.out.println(element);
-    }
   }
 
   void addEdge(int v, int w) {
@@ -166,7 +163,7 @@ public class Tarjan {
       }
     }
 
-    System.out.println((System.currentTimeMillis() - init) + " ms");
+    System.out.println("Tarjan: " + (System.currentTimeMillis() - init) + " ms");
   }
 }
 

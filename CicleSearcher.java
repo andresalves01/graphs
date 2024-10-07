@@ -10,6 +10,7 @@ public class CicleSearcher {
   }
 
   public CicleSearcher(Graph graph) {
+    long millis = System.currentTimeMillis();
     int nodeSize = graph.getNodes().size();
     for (Integer i = 0; i < nodeSize - 1; i++)
       for (Integer j = i + 1; j < nodeSize; j++) {
@@ -21,16 +22,17 @@ public class CicleSearcher {
         if (cicle.isEmpty()) {
           continue;
         }
-        int oldCicleSize = cicle.size();
+        // int oldCicleSize = cicle.size();
 
-        cicle = concatWithOtherCicles(cicle);
-        while (oldCicleSize != cicle.size()) {
-          oldCicleSize = cicle.size();
-          cicle = concatWithOtherCicles(cicle);
-        }
+        // cicle = concatWithOtherCicles(cicle);
+        // while (oldCicleSize != cicle.size()) {
+        // oldCicleSize = cicle.size();
+        // cicle = concatWithOtherCicles(cicle);
+        // }
 
         components.add(cicle);
       }
+    System.out.println("Caminhos disjuntos: " + (System.currentTimeMillis() - millis));
   }
 
   private static Set<Integer> getCicle(Stack<Node> stack, Integer nextNode) {
