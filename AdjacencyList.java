@@ -1,53 +1,17 @@
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import java.util.NoSuchElementException;
-import java.util.Set;
 
-/**
- * AdjacencyList
- */
-public class AdjacencyList implements Graph {
-
-  private final Map<Integer, List<Integer>> adjacents;
+public class AdjacencyList extends Graph {
+  private final Map<Integer, List<Integer>> adjacents = new HashMap<>();
+  private int time = 0;
 
   public AdjacencyList(int numberOfNodes) {
     this(numberOfNodes, 0);
   }
 
   public AdjacencyList(int numberOfNodes, int numberOfEdges) {
-    this.adjacents = new HashMap<>(numberOfNodes);
-    for (int i = 0; i < numberOfNodes; i++) {
-      insertNode(i);
-    }
-  }
-
-  public AdjacencyList(Map<Integer, List<Integer>> adjacents) {
-    this.adjacents = adjacents;
-  }
-
-  @Override
-  public boolean insertNode(int node) {
-    return this.adjacents.putIfAbsent(node, new LinkedList<>()) != null;
-  }
-
-  @Override
-  public boolean contains(int node) {
-    return this.adjacents.containsKey(node);
-  }
-
-  @Override
-  public Set<Integer> getNodes() {
-    return this.adjacents.keySet();
-  }
-
-  @Override
-  public boolean removeNode(int node) {
-    return this.adjacents.remove(node) != null && this.removeEdges(node);
+    super(numberOfNodes);
   }
 
   @Override
@@ -55,29 +19,21 @@ public class AdjacencyList implements Graph {
     List<Integer> originAdjacents = this.adjacents.get(origin);
     List<Integer> destinationAdjacents = this.adjacents.get(destination);
 
-    boolean hasNodes = originAdjacents != null && destinationAdjacents != null;
-    boolean edgeAlreadyInserted = hasNodes
-        && (originAdjacents.contains(destination) || destinationAdjacents.contains(origin));
-    if (!hasNodes || edgeAlreadyInserted) {
+    if (originAdjacents == null && this.contains(origin)) {
+      originAdjacents = new LinkedList<>();
+      this.adjacents.put(origin, originAdjacents);
+    }
+
+    if (destinationAdjacents == null && this.contains(destination)) {
+      destinationAdjacents = new LinkedList<>();
+      this.adjacents.put(destination, destinationAdjacents);
+    }
+
+    if (originAdjacents.contains(destination) || destinationAdjacents.contains(origin)) {
       return false;
     }
 
     return originAdjacents.add(destination) && destinationAdjacents.add(origin);
-  }
-
-  @Override
-  public Set<Edge> getEdges() {
-    Set<Edge> edges = new HashSet<>();
-    for (Entry<Integer, List<Integer>> node : this.adjacents.entrySet()) {
-      Integer origin = node.getKey();
-      for (Integer destination : node.getValue()) {
-        if (origin < destination) {
-          edges.add(new Edge(origin, destination));
-        }
-      }
-    }
-
-    return edges;
   }
 
   @Override
@@ -90,19 +46,17 @@ public class AdjacencyList implements Graph {
   }
 
   @Override
-  public boolean removeEdges(int node) {
-    List<Integer> edges = this.adjacents.get(node);
-    if (edges == null) {
-      return false;
+  public List<Edge> getEdges() {
+    List<Edge> edges = new LinkedList<>();
+    for (Entry<Integer, List<Integer>> node : this.adjacents.entrySet()) {
+      Integer origin = node.getKey();
+      for (Integer destination : node.getValue()) {
+        if (origin < destination) {
+          edges.add(new Edge(origin, destination));
+        }
+      }
     }
-
-    boolean removedEdges = true;
-    for (Integer destination : edges) {
-      removedEdges = removedEdges && removeEdge(node, destination);
-
-    }
-
-    return removedEdges;
+    return edges;
   }
 
   @Override
@@ -113,13 +67,56 @@ public class AdjacencyList implements Graph {
       return false;
     }
 
-    this.adjacents.put(nodeTwo, nodeTwoAdjacents.stream().filter(origin -> origin == nodeOne)
-        .collect(Collectors.toList()));
-
-    this.adjacents.put(nodeOne,
-        nodeOneAdjacents.stream().filter(destination -> destination == nodeTwo).collect(Collectors.toList()));
-
-    return true;
+    return nodeOneAdjacents.remove(nodeTwo) != null && nodeTwoAdjacents.remove(nodeOne) != null;
   }
 
+  public void encontrarArticulacoes() {
+    boolean[] visited = new boolean[getNodes().size()];
+    int[] discoveryTime = new int[getNodes().size()];
+    int[] low = new int[getNodes().size()];
+    int[] parent = new int[getNodes().size()];
+    boolean[] isArticulation = new boolean[getNodes().size()];
+
+    Arrays.fill(parent, -1);
+
+    for (int node : getNodes()) {
+      if (!visited[node]) {
+        encontrarArticulacoesUtil(node, visited, discoveryTime, low, parent, isArticulation);
+      }
+    }
+
+    System.out.println("Articulações no grafo:");
+    for (int i = 0; i < getNodes().size(); i++) {
+      if (isArticulation[i]) {
+        System.out.println("Vértice " + i);
+      }
+    }
+  }
+
+  private void encontrarArticulacoesUtil(int u, boolean[] visited, int[] discoveryTime, int[] low, int[] parent,
+      boolean[] isArticulation) {
+    int filhos = 0;
+    visited[u] = true;
+    discoveryTime[u] = low[u] = ++time;
+
+    for (int v : getAdjacentNodes(u)) {
+      if (!visited[v]) {
+        filhos++;
+        parent[v] = u;
+        encontrarArticulacoesUtil(v, visited, discoveryTime, low, parent, isArticulation);
+
+        low[u] = Math.min(low[u], low[v]);
+
+        if (parent[u] == -1 && filhos > 1) {
+          isArticulation[u] = true;
+        }
+
+        if (parent[u] != -1 && low[v] >= discoveryTime[u]) {
+          isArticulation[u] = true;
+        }
+      } else if (v != parent[u]) {
+        low[u] = Math.min(low[u], discoveryTime[v]);
+      }
+    }
+  }
 }
