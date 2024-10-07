@@ -5,6 +5,10 @@ public class Main {
     // Instancia o grafo com lista de adjacência
     AdjacencyList adjacencyList = new AdjacencyList(6);
 
+  public static void main(String[] args) throws Exception {
+    // Instancia o grafo com lista de adjacência
+    AdjacencyList adjacencyList = new AdjacencyList(6);
+
     adjacencyList.insertEdge(0, 1);
     adjacencyList.insertEdge(1, 2);
     adjacencyList.insertEdge(2, 0);

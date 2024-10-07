@@ -70,6 +70,7 @@ public class AdjacencyList extends Graph {
     return nodeOneAdjacents.remove(nodeTwo) != null && nodeTwoAdjacents.remove(nodeOne) != null;
   }
 
+  // Método para encontrar e exibir articulações
   public void encontrarArticulacoes() {
     boolean[] visited = new boolean[getNodes().size()];
     int[] discoveryTime = new int[getNodes().size()];
@@ -77,7 +78,7 @@ public class AdjacencyList extends Graph {
     int[] parent = new int[getNodes().size()];
     boolean[] isArticulation = new boolean[getNodes().size()];
 
-    Arrays.fill(parent, -1);
+    Arrays.fill(parent, -1); // Inicializa o array de pais com -1
 
     for (int node : getNodes()) {
       if (!visited[node]) {
@@ -85,6 +86,7 @@ public class AdjacencyList extends Graph {
       }
     }
 
+    // Exibe as articulações encontradas
     System.out.println("Articulações no grafo:");
     for (int i = 0; i < getNodes().size(); i++) {
       if (isArticulation[i]) {
@@ -93,6 +95,7 @@ public class AdjacencyList extends Graph {
     }
   }
 
+  // Método utilitário recursivo para encontrar articulações usando DFS
   private void encontrarArticulacoesUtil(int u, boolean[] visited, int[] discoveryTime, int[] low, int[] parent,
       boolean[] isArticulation) {
     int filhos = 0;
